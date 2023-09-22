@@ -4,7 +4,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        Console.WriteLine("Enter a list of numbers, type 0 when finished.");
+        Console.WriteLine("Enter a list of numbers, type \"0\" when finished.");
         string numberInput;
         int number;
         List<int> numbers = new List<int>();
@@ -13,7 +13,10 @@ class Program
             Console.Write("Enter number: ");
             numberInput = Console.ReadLine();
             number = int.Parse(numberInput);
-            numbers.Add(number);
+            if (number != 0)
+            {
+                numbers.Add(number);
+            }
         } while (number != 0);
 
         // Core Requirement 1
@@ -29,7 +32,7 @@ class Program
         Console.WriteLine($"The avearge is: {average}");
 
         // Core Requirement 3
-        int largest = -2000000000;
+        int largest = -2_000_000_000;
         foreach (int addend in numbers)
         {
             if (addend > largest)
@@ -40,7 +43,7 @@ class Program
         Console.WriteLine($"The largest number is: {largest}");
 
         // Stretch Challenge 1
-        int smallest = 2000000000;
+        int smallest = 2_000_000_000;
         foreach (int addend in numbers)
         {
             if (addend > 0 && addend < smallest)
