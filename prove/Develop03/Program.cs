@@ -5,8 +5,8 @@ class Program
     static void Main(string[] args)
     {
         // Initialization
-        // Data scripturesFile = new("lds-scriptures.txt");
-        // Scriptures scriptures = new(scripturesFile.Load());
+        Data scripturesFile = new("lds-scriptures.txt");
+        Scriptures scriptures = new(scripturesFile.LoadText());
         Menu mainMenu = new();
         mainMenu.SetWelcome("Welcome to the Scripture Memorizer program. This program was developed by Bryant Smith for CSE 210 at BYU-I.");
         mainMenu.SetTitle("MAIN MENU");
@@ -39,38 +39,18 @@ class Program
                     break;
                 case 1:
                     Menu scriptureMenu = new();
-                    scriptureMenu.SetTitle("SCRIPTURE SELECTOR");
-                    string[] standardWorks = 
-                    {
-                        "Old Testament",
-                        "New Testament",
-                        "Book of Mormon",
-                        "Doctrine & Covenants",
-                        "Pearl of Great Price"
-                    };
-                    scriptureMenu.SetOptions(standardWorks);
-                    scriptureMenu.AddQuitOption();
-                    do
-                    {
-                        scriptureMenu.Display();
-                        do
-                        {
-                            if (scriptureMenu.ResponseInvalid())
-                            {
-                                scriptureMenu.ErrorMessage();
-                            }
-                            scriptureMenu.Prompt();
-                        } while (scriptureMenu.ResponseInvalid);
-                        string filename = standardWorks[scriptureMenu.EvaluateResponse() - 1];
-                        filename = filename.Replace(" ", "-");
-                        filename = $"{filename.ToLower()}.json";
-                        Data scriptureFile = new(filename);
-                        Scriptures testament = new(scriptureFile.Load());
-                    } while (scriptureMenu.Run());
-                    break;
+                    scriptureMenu.SubtractTitle();
+                    scriptureMenu.SetInstructions("User selection of a scripture is pending.");
+                    scriptureMenu.Display();
+                    Console.Write("Continue");
+                    Console.ReadLine();
+                    Reference reference = new("Articles of Faith", 1, 13);
+                    Scripture scripture = new(reference);
+                    scripture.Memorize();
+                    goto case 3;
                 case 2:
-                    Console.WriteLine("Retrieve");
-                    break;
+                    Console.WriteLine("Function pending.");
+                    goto case 3;
                 case 3:
                     mainMenu.Quit();
                     break;

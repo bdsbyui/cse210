@@ -5,22 +5,27 @@ public class Scriptures
 {
     private List<Verse> _verses = new();
 
-    public Scriptures(string[] verseStrings)
+    public Scriptures(string[] textFile)
     {
-        foreach (string verseString in verseStrings)
+        foreach (string verseString in textFile)
         {
             string[] referenceAndText = verseString.Split("     ");
             string referenceString = referenceAndText[0];
-            (string, int, int) reference = Parse(referenceString);
-            string bookName = reference.Item1;
-            int chapterNumber = reference.Item2;
-            int verseNumber = reference.Item3;
+            Reference reference = new(referenceString);
             string verseText = referenceAndText[1];
-            Verse verse = new(bookName, chapterNumber, verseNumber, verseText);
+            Verse verse = new(reference , verseText);
             _verses.Add(verse);
         }
     }
 
+    // Methods
+    public void Display()
+    {
+        foreach(Verse verse in _verses)
+        {
+            verse.Display();
+        }
+    }
     private (string book, int chapter, int verse) Parse(string reference)
     {
         string[] splitReference = reference.Split(" ");
@@ -41,11 +46,16 @@ public class Scriptures
         int verseNumber = int.Parse(referenceNumbers[1]);
         return (bookString, chapterNumber, verseNumber);
     }
-    public void Display()
+    public Verse Search(Reference reference)
     {
-        foreach(Verse verse in _verses)
+        Verse result = default;
+        foreach (Verse verse in _verses)
         {
-            verse.Display();
+            if (verse.GetReference().GetBook() == reference.GetBook())
+            {
+                result = verse;
+            }
         }
+        return result;
     }
 }

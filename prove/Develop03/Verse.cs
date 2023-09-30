@@ -2,20 +2,28 @@ using System;
 
 public class Verse
 {
-    private string _book;
-    private int _chapter;
-    private int _verse;
+    // Attributes
+    private Reference _reference;
     private string _text;
 
-    public Verse(string book, int chapter, int verse, string text)
+    // Constructor
+    public Verse(Reference reference, string text)
     {
-        _book = book;
-        _chapter = chapter;
-        _verse = verse;
+        _reference = reference;
         _text = text;
+    }
+
+    // Getters
+    public Reference GetReference()
+    {
+        return _reference;
+    }
+    public string GetText()
+    {
+        return _text;
     }
     public void Display()
     {
-        Console.WriteLine($"{_book} {_chapter}:{_verse}");
+        Console.WriteLine($"{_reference.GetVerse()}  {_text}");
     }
 }

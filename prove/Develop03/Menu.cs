@@ -6,6 +6,7 @@ public class Menu
     // Attributes
     private string _error;
     private string _instructions;
+    private int _margin;
     private List<string> _options;
     private string _prompt;
     private bool _quit;
@@ -15,11 +16,11 @@ public class Menu
     private string _welcome;
     private int _width;
 
-    // Constructors
+    // Constructor
     public Menu()
     {
         _error = $"\"{_response}\" is invalid. ";
-        _prompt = "\t> ";
+        _prompt = "> ";
         _quit = false;
         _title = "MENU";
         _valid = true;
@@ -56,6 +57,12 @@ public class Menu
         _width = width;
     }
 
+    // Getter
+    public string GetResponse()
+    {
+        return _response;
+    }
+
     // Methods
     private List<string> Accept(int optionNumber, string option)
     // Called by Validate() to create list of acceptable responses.
@@ -87,29 +94,39 @@ public class Menu
                 Console.WriteLine(line);
             }
         }
-        int titleMarginWidth = (_width - _title.Length) / 2;
         Console.WriteLine($"\n{Border("*", _width)}");
-        Console.Write($"{Border(" ", titleMarginWidth)}");
-        Console.Write(_title);
-        Console.Write($"{Border(" ", titleMarginWidth)}\n");
+        if (_title != null)
+        {
+            _margin = (_width - _title.Length) / 2;
+            Console.Write($"{Border(" ", _margin)}");
+            Console.Write(_title);
+            Console.Write($"{Border(" ", _margin)}\n");
+        }
+        if (_title != null && _instructions != null)
+        {
+            Console.Write($"{Border(" ", _margin)}");
+            Console.Write($"{Border("-", _title.Length)}");
+            Console.Write($"{Border(" ", _margin)}\n");
+        }
         if (_instructions != null)
         {
-            Console.Write($"{Border(" ", titleMarginWidth)}");
-            Console.Write($"{Border("-", _title.Length)}");
-            Console.Write($"{Border(" ", titleMarginWidth)}\n");
             foreach (string line in Wrap(_instructions, _width))
             {
                 Console.WriteLine(line);
             }
         }
         Console.WriteLine($"{Border("*", _width)}\n");
-        for (int i = 0; i < _options.Count(); i++)
+        if (_options != null)
         {
-            Console.WriteLine($"{i + 1, 2}. {_options[i]} ");
+            for (int i = 0; i < _options.Count(); i++)
+            {
+                Console.WriteLine($"{i + 1, 2}. {_options[i]} ");
+            }
         }
         Console.WriteLine("");
     }
     public void ErrorMessage()
+    // Called by Program.cs to display validation error.
     {
         Console.Write(_error);
     }
@@ -133,13 +150,16 @@ public class Menu
         _quit = true;
     }
 
-    public void Prompt()
+    public void Prompt(bool validate=true)
     // Called by Program.cs to prompt and read user response.
     {
         Console.Write($"\n{_prompt}");
         _response = Console.ReadLine();
         Console.WriteLine("");
-        Validate(_response);
+        if (validate)
+        {
+            Validate(_response);
+        }
     }
     public void Quit()
     {
@@ -153,13 +173,17 @@ public class Menu
     {
         return !_quit;
     }
+    public void SubtractTitle()
+    {
+        _title = null;
+    }
     public bool TrueFalse(string query)
     // Called by Program.cs to prompt and read response to a binary question.
     {
-        string[] affirmative = {"1", "y", "t"};
+        string[] negative = {"0", "n", "f"};
         Console.Write(query);
         string response = Console.ReadLine();
-        return affirmative.Contains(response[0].ToString().ToLower());
+        return !negative.Contains(response[0].ToString().ToLower());
     }
     public void Validate(string response)
     // Called by Program.cs to validate user response.
