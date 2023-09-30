@@ -56,12 +56,6 @@ public class Menu
         _width = width;
     }
 
-    // Getter
-    public string GetError()
-    {
-        return _error;
-    }
-
     // Methods
     private List<string> Accept(int optionNumber, string option)
     // Called by Validate() to create list of acceptable responses.
@@ -73,6 +67,10 @@ public class Menu
         };
         return acceptableResponses;
     }
+    public void AddQuitOption()
+    {
+        _options.Add("Quit");
+    }
     private string Border(string symbol, int width)
     // Adapted from https://stackoverflow.com/questions/411752/best-way-to-repeat-a-character-in-c-sharp
     {
@@ -81,7 +79,7 @@ public class Menu
     public void Display()
     // Called by Program.cs to display menu.
     {
-        Console.WriteLine("");
+        Console.Clear();
         if (_welcome != null)
         {
             foreach (string line in Wrap(_welcome, _width))
@@ -111,6 +109,11 @@ public class Menu
         }
         Console.WriteLine("");
     }
+    public void ErrorMessage()
+    {
+        Console.Write(_error);
+    }
+
     public int EvaluateResponse()
     // Called by Program.cs to return user selection as case integer.
     {

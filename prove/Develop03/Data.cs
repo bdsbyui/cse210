@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.json;
 
 public class Data
 {
@@ -14,7 +15,8 @@ public class Data
     {
         return File.Exists(_filename);
     }
-    public string[] Load()
+    
+    public string[] LoadText()
     {
         string[] input;
         if (CheckFile())
