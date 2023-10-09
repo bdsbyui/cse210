@@ -10,7 +10,6 @@ class Program
                 "Reflecting activity",
                 "Listing activity"
             };
-            string activity = activities[0];
         
         Menu menu = new();
         menu.SetOptions(activities);
