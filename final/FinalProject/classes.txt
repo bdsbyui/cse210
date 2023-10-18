@@ -1,0 +1,76 @@
+Location
+_locality : string
+_administrativeAreaLevel2 : string
+_administrativeAreaLevel1 : string
+_country : string
+_formattedAddres : string
+_latitude : float
+_longitude : float
+GetLevel0() : string
+GetLevel1() : string
+GetLevel2() : string
+GetLevel3() : string
+Display() : void
+
+LocationManager
+_locations : List<Location>
+Display() : void
+Group() : void
+Sort() : void
+
+Constants
+GoogleMapsKey
+OpenWeatherKey
+
+ApiCaller
+Get() : string
+
+GoogleMapsCaller : ApiCaller
+_baseUrl: string
+_endPoint : string
+Deserialize() : Location
+
+OpenWeatherCaller : ApiCaller
+_baseUrl : string
+_endPoint : string
+Deserialize() : Forecast
+
+Forecast
+_location : Location
+_forecast : string
+
+ForecastManager
+_forecasts : List<Forecast>
+AddReplace(Forecast) : void
+CheckCurrency() : void
+Display() : void
+ReadCurrent() : Current
+ReadMinutely() : List<Minute>
+ReadHourly() : List<Hour>
+ReadDaily() : List<Day>
+
+Forecasts
+_timezoneOffest : int
+_time : DateTime
+
+Current : Forecasts
+_temperature : float
+_feelsLike : float
+Display() : void
+
+Minute : Forecasts
+_time : DateTime
+_precepitation : int
+Display() : void
+
+Hour : Forecasts
+_time : DateTime
+_temperature : float
+_feelsLike : float
+Display() : void
+
+Day : Forecasts
+_time : DateTime
+_temperature : List<float>
+_feelsLike : List<float
+
