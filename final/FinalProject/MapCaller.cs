@@ -1,21 +1,22 @@
 using System;
-using Newtonsoft.Json;
 
 public class MapCaller : ApiCaller
 {
-    // pending parsing
-    private string url = "https://maps.googleapis.com/maps/api/geocode/json?address=11762+Gascony+Place,+Woodbridge,+VA&key=AIzaSyBbSy-ZSL9fw-ukvAUxrxXUDgaek_P25EQ";
-    private string _search;
+    private string _baseUrl 
+            = "https://maps.googleapis.com/maps/api/geocode/";
+    private string _key = "AIzaSyBbSy-ZSL9fw-ukvAUxrxXUDgaek_P25EQ";
+    private string _relativeUrl;
 
     public MapCaller(string search)
     {
-        _search = search;
+        SetBaseUrl(_baseUrl);
+        _relativeUrl = $"json?address={search.Replace(' ', '+')}&key={_key}";
     }
 
-    public override async Task<Forecast> Lookup()
+    public override async Task<Forecast> Call()
     {
-        string json = await base._client.GetStringAsync(url); // pending parsing
-        MapResponse response = JsonConvert.DeserializeObject<MapResponse>(json);
+        MapResponse response = await GetReponse<MapResponse>(_relativeUrl);
+
         string locality = GetAddressComponent
         (
             response.results[0].address_components, "locality"
@@ -23,8 +24,10 @@ public class MapCaller : ApiCaller
         string address = response.results[0].formatted_address;
         double latitude = response.results[0].geometry.location.lat;
         double longitude = response.results[0].geometry.location.lng;
+
         Place place = new(locality, address, latitude, longitude);
         Forecast forecast = new(place);
+        
         return forecast;
     }
 

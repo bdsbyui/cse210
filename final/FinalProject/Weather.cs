@@ -2,70 +2,77 @@ using System;
 
 public class Weather
 {
-    public string timezone { get; set; }
-    public int timezone_offset { get; set; }
-    public Current current { get; set; }
-    public List<Minutely> minutely { get; set; }
-    public List<Hourly> hourly { get; set; }
-    public List<Daily> daily { get; set; }
-}
+    private int _localOffset;
+    private DateTime _forecastTime;
+    private DateTime _lastDay;
+    private DateTime _lastHour;
+    private DateTime _lastMinute;
+    private Current _currentForecast;
+    private List<Minutely> _minutelies;
+    private List<Hourly> _hourlies;
+    private List<Daily> _dailies;
 
-public class Current
-{
-    public int dt { get; set; }
-    public int sunrise { get; set; }
-    public int sunset { get; set; }
-    public double temp { get; set; }
-    public double feels_like { get; set; }
-    public double wind_speed { get; set; }
-    public int wind_deg { get; set; }
-}
+    public Weather(WeatherResponse response)
+    {
+        _localOffset = response.timezone_offset;
+        _forecastTime = UtcUnixToLocalDateTime(response.current.dt);
+        _currentForecast = response.current;
+        _minutelies = response.minutely;
+        _lastMinute = UtcUnixToLocalDateTime(_minutelies.Last().dt);
+        _hourlies = response.hourly;
+        _lastHour = UtcUnixToLocalDateTime(_hourlies.Last().dt);
+        _dailies = response.daily;
+        _lastDay = UtcUnixToLocalDateTime(_dailies.Last().dt);
+    }
 
-public class Minutely
-{
-    public int dt { get; set; }
-    public int precipitation { get; set; }
-}
+    public Current GetCurrent()
+    {
+        return _currentForecast;
+    }
 
-public class Hourly
-{
-    public int dt { get; set; }
-    public double temp { get; set; }
-    public double feels_like { get; set; }
-    public double wind_speed { get; set; }
-    public int wind_deg { get; set; }
-}
+    public List<Daily> GetDailies()
+    {
+        return _dailies;
+    }
 
-public class Daily
-{
-    public int dt { get; set; }
-    public int sunrise { get; set; }
-    public int sunset { get; set; }
-    public int moonrise { get; set; }
-    public int moonset { get; set; }
-    public double moon_phase { get; set; }
-    public string summary { get; set; }
-    public Temp temp { get; set; }
-    public FeelsLike feels_like { get; set; }
-    public double wind_speed { get; set; }
-    public int wind_deg { get; set; }
-    public double? rain { get; set; }
-}
+    public DateTime GetForecastTime()
+    {
+        return _forecastTime;
+    }
 
-public class Temp
-{
-    public double day { get; set; }
-    public double min { get; set; }
-    public double max { get; set; }
-    public double night { get; set; }
-    public double eve { get; set; }
-    public double morn { get; set; }
-}
+    public List<Hourly> GetHourlies()
+    {
+        return _hourlies;
+    }
 
-public class FeelsLike
-{
-    public double day { get; set; }
-    public double night { get; set; }
-    public double eve { get; set; }
-    public double morn { get; set; }
+    public DateTime GetLastDay()
+    {
+        return _lastDay;
+    }
+
+    public DateTime GetLastHour()
+    {
+        return _lastHour;
+    }
+
+    public DateTime GetLastMinute()
+    {
+        return _lastMinute;
+    }
+
+    public List<Minutely> GetMinutelies()
+    {
+        return _minutelies;
+    }
+
+    public int GetTimeZoneOffset()
+    {
+        return _localOffset;
+    }
+
+    public DateTime UtcUnixToLocalDateTime(int unixUtc)
+    {
+        DateTime dateTime = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        return dateTime.AddSeconds(unixUtc + _localOffset);
+    }
 }

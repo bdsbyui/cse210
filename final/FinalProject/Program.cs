@@ -7,13 +7,13 @@ class Program
         static Forecast CallMapAsync(string search)
         {
             MapCaller caller = new(search);
-            return caller.Lookup().Result;
+            return caller.Call().Result;
         }
 
         static void CallWeatherAsync(Forecast forecast)
         {
             WeatherCaller caller = new(forecast);
-            caller.Lookup().Wait();
+            caller.Call().Wait();
         }
 
         Forecasts forecasts = new();  // or load Forecasts object
@@ -74,11 +74,10 @@ class Program
                                 new List<string>()
                                 {
                                     "Update forecast",
-                                    $"Current forecast as of {selectedForecast.PutCurrentTime()}",
-                                    $"Minutely forecast until {selectedForecast.PutLatestMinute()}",
-                                    $"Hourly forecast until {selectedForecast.PutLatestHour()}",
-                                    $"Daily forecast until {selectedForecast.PutLatestDay()}",
-                                    "Alerts",
+                                    $"Current forecast as of {selectedForecast.PutForecastTime()}",
+                                    $"{selectedForecast.PutMinutelyOption()}",
+                                    $"{selectedForecast.PutHourlyOption()}",
+                                    $"{selectedForecast.PutDailyOption()}",
                                     "Quit",
                                 }
                             );
@@ -111,15 +110,9 @@ class Program
                                     break;
                                 
                                 case 6:
-                                    selectedForecast.DisplayAlerts();
-                                    break;
-                                
-                                case 7:
                                     forecastMenu.Quit();
                                     break;
                             }
-
-                            
                             break;
                     }
                     break;
@@ -136,12 +129,13 @@ class Program
                     CallWeatherAsync(newForecast);
                     forecasts.Add(newForecast);
                     break;
+                    
                 case 3:
                     mainMenu.Quit();
                     break;
             }
         } while (mainMenu.Running());
-        
+
         // save Forecasts object
     }
 }

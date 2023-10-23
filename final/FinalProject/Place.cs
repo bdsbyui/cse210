@@ -21,6 +21,16 @@ public class Place
         _longitude = longitude.ToString();
     }
 
+    public string GetLatitude()
+    {
+        return _latitude;
+    }
+
+    public string GetLongitude()
+    {
+        return _longitude;
+    }
+
     public string GetLongName()
     {
         return _longName;

@@ -1,24 +1,27 @@
 using System;
-using Newtonsoft.Json;
 
 public class WeatherCaller : ApiCaller
 {
-    // pending parsing
-    private string url = "https://api.openweathermap.org/data/3.0/onecall?lat=38.6977604&lon=-77.32165239999999&appid=040c9732ca7f6f93a9be29e9c6078796";
+    private string _baseUrl = "https://api.openweathermap.org/data/3.0/";
+    private string _key = "040c9732ca7f6f93a9be29e9c6078796";
+    private string _relativeUrl;
+    private string _units = "imperial";
     private Forecast _forecast;
 
     public WeatherCaller(Forecast forecast)
     {
         _forecast = forecast;
+        SetBaseUrl(_baseUrl);
+        (string latitude, string longitude) = forecast.GetCoordinates();
+        _relativeUrl = $"onecall?lat={latitude}&lon={longitude}&units={_units}&appid={_key}";
     }
 
-    public override async Task Lookup()
+    public override async Task Call()
     {
-        string json = await base._client.GetStringAsync(url); // pending parsing
-        Weather response = JsonConvert.DeserializeObject<Weather>(json);
-        _forecast.UpdateWeather(response);
+        WeatherResponse response = await GetReponse<WeatherResponse>(_relativeUrl);
+        Weather weather = new(response);
+        _forecast.UpdateWeather(weather);
     }
-
 }
 
 
