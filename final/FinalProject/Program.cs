@@ -16,7 +16,7 @@ class Program
             caller.Call().Wait();
         }
 
-        Forecasts forecasts = new();  // or load Forecasts object
+        Forecasts forecasts = new();
 
         Menu mainMenu = new("MAIN MENU");
 
@@ -37,7 +37,7 @@ class Program
             switch (mainMenu.PromptValidatedSelection())
             {
                 case 0:
-                    mainMenu.Kill();  // tries before kill?
+                    mainMenu.Kill();
                     break;
 
                 case 1:
@@ -63,56 +63,60 @@ class Program
                                     = forecasts.AccessForecast(selection - 1);
                             Menu forecastMenu = new(
                                     $"FORECAST FOR {selectedForecast.PutShortPlaceName()}");
-                            forecastMenu.SetContext
-                            (
-                                $"Local time is currently {selectedForecast.PutCurrentTime(
-                                    )}. The forecast was last updated {selectedForecast.PutElapsedTime(
-                                        )} ago."
-                            );
-                            forecastMenu.SetOptions
-                            (
-                                new List<string>()
-                                {
-                                    "Update forecast",
-                                    $"Current forecast as of {selectedForecast.PutForecastTime()}",
-                                    $"{selectedForecast.PutMinutelyOption()}",
-                                    $"{selectedForecast.PutHourlyOption()}",
-                                    $"{selectedForecast.PutDailyOption()}",
-                                    "Quit",
-                                }
-                            );
 
-                            forecastMenu.Display();
-                            switch (forecastMenu.PromptValidatedSelection())
+                            do
                             {
-                                case 0:
-                                    forecastMenu.Kill();
-                                    break;
-                                
-                                case 1:
-                                    CallWeatherAsync(selectedForecast);
-                                    break;
-                                
-                                case 2:
-                                    selectedForecast.DisplayCurrent();
-                                    break;
-                                
-                                case 3:
-                                    selectedForecast.DisplayMinutely();
-                                    break;
-                                
-                                case 4:
-                                    selectedForecast.DisplayHourly();
-                                    break;
-                                
-                                case 5:
-                                    selectedForecast.DisplayDaily();
-                                    break;
-                                
-                                case 6:
-                                    forecastMenu.Quit();
-                                    break;
-                            }
+                                forecastMenu.SetContext
+                                (
+                                    $"Local time is currently {selectedForecast.PutCurrentTime(
+                                        )}. The forecast was last updated {selectedForecast.PutElapsedTime(
+                                            )} ago."
+                                );
+                                forecastMenu.SetOptions
+                                (
+                                    new List<string>()
+                                    {
+                                        "Update forecast",
+                                        $"Current forecast as of {selectedForecast.PutForecastTime()}",
+                                        $"{selectedForecast.PutMinutelyOption()}",
+                                        $"{selectedForecast.PutHourlyOption()}",
+                                        $"{selectedForecast.PutDailyOption()}",
+                                        "Quit",
+                                    }
+                                );
+
+                                forecastMenu.Display();
+                                switch (forecastMenu.PromptValidatedSelection())
+                                {
+                                    case 0:
+                                        forecastMenu.Kill();
+                                        break;
+
+                                    case 1:
+                                        CallWeatherAsync(selectedForecast);
+                                        break;
+
+                                    case 2:
+                                        selectedForecast.DisplayCurrent();
+                                        break;
+
+                                    case 3:
+                                        selectedForecast.DisplayMinutely();
+                                        break;
+
+                                    case 4:
+                                        selectedForecast.DisplayHourly();
+                                        break;
+
+                                    case 5:
+                                        selectedForecast.DisplayDaily();
+                                        break;
+
+                                    case 6:
+                                        forecastMenu.Quit();
+                                        break;
+                                }
+                            } while (forecastMenu.Running());                            
                             break;
                     }
                     break;
@@ -120,7 +124,7 @@ class Program
                 case 2:
                     Menu addMenu = new("ADD LOCATION");
                     addMenu.Display();
-                    
+
                     string search = addMenu.PromptUnvalidatedResponse
                     (
                         "Enter a location: "
@@ -129,13 +133,11 @@ class Program
                     CallWeatherAsync(newForecast);
                     forecasts.Add(newForecast);
                     break;
-                    
+
                 case 3:
                     mainMenu.Quit();
                     break;
             }
         } while (mainMenu.Running());
-
-        // save Forecasts object
     }
 }

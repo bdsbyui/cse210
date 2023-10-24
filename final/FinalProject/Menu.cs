@@ -221,6 +221,7 @@ public class Menu
         return string.Concat(Enumerable.Repeat(symbol, length));
     }
 
+
     //  Static Method ---------------------------------------------------
     public static (string, string) GetSubjectVerb(int count)
     {

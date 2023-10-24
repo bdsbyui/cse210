@@ -12,20 +12,28 @@ public class Forecast
 
     public void DisplayCurrent()
     {
+        DateTime forecastTime = UtcUnixToLocalDateTime(_weather.GetCurrent().dt);
         string title = $"CURRENT WEATHER FOR {_place.GetShortName()} AS OF "
-                + _weather.GetForecastTime().ToString("dddd, h:mm tt");
+                + forecastTime.ToString("dddd, h:mm tt");
+
         Menu currentForecast = new(title);
         currentForecast.Display();
-        string sunrise = _weather.UtcUnixToLocalDateTime(_weather.GetCurrent(
-                ).sunrise).ToString("HH:mm");
-        string sunset = _weather.UtcUnixToLocalDateTime(_weather.GetCurrent(
-                ).sunset).ToString("HH:mm");
-        string temp = $"{_weather.GetCurrent().temp}{'\u2109'}";
-        string feel = $"{_weather.GetCurrent().feels_like}{'\u2109'}";
-        string speed = $"{_weather.GetCurrent().wind_speed}mph";
-        string direction = $"{_weather.GetCurrent().wind_deg}{'\u00B0'}";
-        Console.WriteLine($"Sunrise: {sunrise} Temperature: {temp}     Wind Speed: {speed}");
-        Console.WriteLine($" Sunset: {sunset}  Feels like: {feel} Wind Direction: {direction}");
+
+        string temp = $"{(int) _weather.GetCurrent().temp:D}{'\u2109'}";
+        string feel = $"{(int) _weather.GetCurrent().feels_like:D}{'\u2109'}";
+        string wspd = $"{(int) _weather.GetCurrent().wind_speed:D} mph";
+        string wdir = $"{_weather.GetCurrent().wind_deg}{'\u00B0'}";
+        string sris = UtcUnixToLocalDateTime(_weather.GetCurrent().sunrise).ToString("HH:mm");
+        string sset = UtcUnixToLocalDateTime(_weather.GetCurrent().sunset).ToString("HH:mm");
+
+        Console.WriteLine
+        (
+            $"\t{"Temperature:",12} {temp,5}  {"Wind speed:",15} {wspd,-7}  {"Sunrise:",8} {sris} hrs"
+        );
+        Console.WriteLine
+        (
+            $"\t{"Feels like:",12} {feel,5}  {"Wind direction:",15} {wdir,-7}  {"Sunset:",8} {sset} hrs"
+        );
         Console.WriteLine();
         Console.Write("Press <Enter> to continue.");
         Console.ReadLine();
@@ -33,39 +41,66 @@ public class Forecast
 
     public void DisplayDaily()
     {
-        if (DateTime.UtcNow.AddSeconds(_weather.GetTimeZoneOffset())
-                < _weather.GetLastDay())
+        DateTime now = DateTime.UtcNow.AddSeconds(_weather.GetTimeZoneOffset());
+        DateTime expiration = UtcUnixToLocalDateTime(_weather.GetDailies().Last().dt);
+        if (now < expiration)
         {
             string title = $"DAILY FORECAST FOR {_place.GetShortName()} UNTIL "
-                + _weather.GetLastDay().ToString("dddd");
+                    + expiration.ToString("dddd");
+            
             Menu dailyForecast = new(title);
             dailyForecast.Display();
+            
             foreach (Daily day in _weather.GetDailies())
             {
-                string time = _weather.UtcUnixToLocalDateTime(day.dt).ToString("dddd");
-                string sunrise = _weather.UtcUnixToLocalDateTime(day.sunrise)
-                        .ToString("HH:mm");
-                string sunset = _weather.UtcUnixToLocalDateTime(day.sunset)
-                        .ToString("HH:mm");
-                string moonrise = _weather.UtcUnixToLocalDateTime(day.moonrise)
-                        .ToString("HH:mm");
-                string moonset = _weather.UtcUnixToLocalDateTime(day.moonset)
-                        .ToString("HH:mm");
-                
-                string temp = $"{day.temp}{'\u2109'}";
-                string feel = $"{day.feels_like}{'\u2109'}";
-                string speed = $"{day.wind_speed}mph";
-                string direction = $"{day.wind_deg}{'\u00B0'}";
-                Console.WriteLine(time);
-                Console.WriteLine(string.Concat(Enumerable.Repeat("-", 72)));
-                Console.WriteLine($"Sunrise: {sunrise} Temperature: {temp}     Wind Speed: {speed}");
-                Console.WriteLine($" Sunset: {sunset}  Feels like: {feel} Wind Direction: {direction}");
-                Console.WriteLine();
+                DateTime dt = UtcUnixToLocalDateTime(day.dt);
+                if (now < dt)
+                {
+                    string time = dt.ToString("dddd, MMM d");
+                    string smry = day.summary;
+                    string tmax = $"{(int) day.temp.max:D}{'\u2109'}";
+                    string tmin = $"{(int) day.temp.min:D}{'\u2109'}";
+                    string tmrn = $"{(int) day.temp.morn:D}{'\u2109'}";
+                    string tday = $"{(int) day.temp.day:D}{'\u2109'}";
+                    string teve = $"{(int) day.temp.eve:D}{'\u2109'}";
+                    string tngt = $"{(int) day.temp.night:D}{'\u2109'}";
+                    string fmrn = $"{(int) day.feels_like.morn:D}{'\u2109'}";
+                    string fday = $"{(int) day.feels_like.day:D}{'\u2109'}";
+                    string feve = $"{(int) day.feels_like.eve:D}{'\u2109'}";
+                    string fngt = $"{(int) day.feels_like.night:D}{'\u2109'}";
+                    string wspd = $"{(int) day.wind_speed:D} mph";
+                    string wdir = $"{day.wind_deg}{'\u00B0'}";
+                    string sris = UtcUnixToLocalDateTime(day.sunrise).ToString("HH:mm");
+                    string sset = UtcUnixToLocalDateTime(day.sunset).ToString("HH:mm");
+                    string mris = UtcUnixToLocalDateTime(day.moonrise).ToString("HH:mm");
+                    string mset = UtcUnixToLocalDateTime(day.moonset).ToString("HH:mm");
+
+                    Console.WriteLine(time);
+                    Console.WriteLine(string.Concat(Enumerable.Repeat("-", 27)));
+                    Console.WriteLine(smry);
+                    Console.WriteLine
+                    (
+                        $"\t{"High:",-5}   {tmrn,5} morning {fmrn,-5}   {"Speed:",-10}   {"Sunrise:",9} {sris} hrs"
+                    );
+                    Console.WriteLine
+                    (
+                        $"\t{tmax,5}   {tday,5}   day   {fday,-5}   {wspd,10}   {"Sunset:",9} {sset} hrs"
+                    );
+                    Console.WriteLine
+                    (
+                        $"\t{"Low:",-5}   {teve,5} evening {feve,-5}   {"Direction:",-10}   {"Moonrise:",9} {mris} hrs"
+                    );
+                    Console.WriteLine
+                    (
+                        $"\t{tmin,5}   {tngt,5}  night  {fngt,-5}   {wdir,10}   {"Moonset:",9} {mset} hrs"
+                    );
+                    Console.WriteLine();
+                }
             }
         }
         else
         {
-            Console.WriteLine("Daily forecasts expired. Please update forecast.");
+            Console.WriteLine("Daily forecasts have expired. Please update the forecast.");
         }
         Console.WriteLine();
         Console.Write("Press <Enter> to continue.");
@@ -74,27 +109,42 @@ public class Forecast
 
     public void DisplayHourly()
     {
-        if (DateTime.UtcNow.AddSeconds(_weather.GetTimeZoneOffset())
-                < _weather.GetLastHour())
+        DateTime now = DateTime.UtcNow.AddSeconds(_weather.GetTimeZoneOffset());
+        DateTime expiration = UtcUnixToLocalDateTime(_weather.GetHourlies().Last().dt);
+        if (now < expiration)
         {
             string title = $"HOURLY FORECAST FOR {_place.GetShortName()} UNTIL "
-                + _weather.GetLastHour().ToString("h tt");
+                    + expiration.ToString("dddd h tt");
+            
             Menu hourlyForecast = new(title);
             hourlyForecast.Display();
+            
             foreach (Hourly hour in _weather.GetHourlies())
             {
-                string time = _weather.UtcUnixToLocalDateTime(hour.dt).ToString("hh tt");
-                string temp = $"{hour.temp}{'\u2109'}";
-                string feel = $"{hour.feels_like}{'\u2109'}";
-                string speed = $"{hour.wind_speed}mph";
-                string direction = $"{hour.wind_deg}{'\u00B0'}";
-                Console.WriteLine($"{time} - Temperature: {temp}     Wind Speed: {speed}");
-                Console.WriteLine($"         Feels like: {feel} Wind Direction: {direction}");
+                DateTime dt = UtcUnixToLocalDateTime(hour.dt);
+                if (now < dt)
+                {
+                    string time = dt.ToString("h tt");
+                    string temp = $"{(int) hour.temp:D}{'\u2109'}";
+                    string feel = $"{(int) hour.feels_like:D}{'\u2109'}";
+                    string wspd = $"{(int) hour.wind_speed:D} mph";
+                    string wdir = $"{hour.wind_deg}{'\u00B0'}";
+
+                    Console.WriteLine
+                    (
+                        $"\t{time,5} --     {"Temperature:",12} {temp,5}     {"Wind speed:",15} {wspd,-10}"
+                    );
+                    Console.WriteLine
+                    (
+                        $"\t{"",5}        {"Feels like:",12} {feel,5}     {"Wind direction:",15} {wdir,-10}"
+                    );
+                    Console.WriteLine();
+                }
             }
         }
         else
         {
-            Console.WriteLine("Hourly forecasts expired. Please update forecast.");
+            Console.WriteLine("Hourly forecasts have expired. Please update the forecast.");
         }
         Console.WriteLine();
         Console.Write("Press <Enter> to continue.");
@@ -103,22 +153,34 @@ public class Forecast
 
     public void DisplayMinutely()
     {
-        if (DateTime.UtcNow.AddSeconds(_weather.GetTimeZoneOffset())
-                < _weather.GetLastMinute())
+        DateTime now = DateTime.UtcNow.AddSeconds(_weather.GetTimeZoneOffset());
+        DateTime expiration = UtcUnixToLocalDateTime(_weather.GetMinutelies().Last().dt);
+        if (now < expiration)
         {
             string title = $"MINUTELY FORECAST FOR {_place.GetShortName()} UNTIL "
-                + _weather.GetLastMinute().ToString("h:mm tt");
+                    + expiration.ToString("h:mm tt");
+            
             Menu minutelyForecast = new(title);
             minutelyForecast.Display();
+            
             foreach (Minutely minute in _weather.GetMinutelies())
             {
-                string time = _weather.UtcUnixToLocalDateTime(minute.dt).ToString("HH:mm");
-                Console.WriteLine($"{minute.precipitation} mm/h of precipitation forecast for {time}");
+                DateTime dt = UtcUnixToLocalDateTime(minute.dt);
+                if (now < dt)
+                {
+                    string time = dt.ToString("h:mm tt");
+                    string prcp = minute.precipitation.ToString();
+
+                    Console.WriteLine
+                    (
+                        $"The forecast is for {prcp} mm/hr of precipitation at {time}."
+                    );
+                }
             }
         }
         else
         {
-            Console.WriteLine("Minutely forecasts expired. Please update forecast.");
+            Console.WriteLine("Minutely forecasts have expired. Please update the forecast.");
         }
         Console.WriteLine();
         Console.Write("Press <Enter> to continue.");
@@ -132,24 +194,21 @@ public class Forecast
 
     public string PutCurrentTime()
     {
-        DateTime currentTime = DateTime.Now;
-        currentTime = currentTime.AddSeconds(_weather.GetTimeZoneOffset());
-        return currentTime.ToString("dddd, h:mm tt");
+        DateTime now = DateTime.UtcNow.AddSeconds(_weather.GetTimeZoneOffset());
+        return now.ToString("dddd, h:mm tt");
     }
 
-    public string PutDailyOption()
+    public string PutForecastTime()
     {
-        string dateTime = _weather.GetLastDay().ToString("dddd");
-        if (DateTime.Now > _weather.GetLastDay())
-        {            
-            return $"Daily forecasts until {dateTime}";
-        }
-        return $"Daily forecasts expired {dateTime}";        
+        DateTime forecastTime = UtcUnixToLocalDateTime(_weather.GetCurrent().dt);
+        return forecastTime.ToString("dddd, h:mm tt");
     }
 
     public string PutElapsedTime()
     {
-        TimeSpan interval = DateTime.Now - _weather.GetForecastTime();
+        DateTime now = DateTime.UtcNow.AddSeconds(_weather.GetTimeZoneOffset());
+        DateTime forecastTime = UtcUnixToLocalDateTime(_weather.GetCurrent().dt);
+        TimeSpan interval = now - forecastTime;
         if (interval.TotalSeconds < 120)
         {
             return $"{(int) interval.TotalSeconds:D} seconds";
@@ -165,34 +224,45 @@ public class Forecast
         return $"{(int) interval.TotalDays:D} days";
     }
 
-    public string PutForecastTime()
+    public string PutMinutelyOption()
     {
-        return _weather.GetForecastTime().ToString("dddd, h:mm tt");
+        DateTime now = DateTime.UtcNow.AddSeconds(_weather.GetTimeZoneOffset());
+        DateTime expirationDt = UtcUnixToLocalDateTime(_weather.GetMinutelies().Last().dt);
+        string expirationStr = expirationDt.ToString("h:mm tt");
+        if (now < expirationDt)
+        {            
+            return $"Minutely forecast until {expirationStr}";
+        }
+        return $"Minutely forecasts expired {expirationStr}";        
     }
 
     public string PutHourlyOption()
     {
-        string dateTime = _weather.GetLastHour().ToString("dddd, h tt");
-        if (DateTime.Now > _weather.GetLastHour())
+        DateTime now = DateTime.UtcNow.AddSeconds(_weather.GetTimeZoneOffset());
+        DateTime expirationDt = UtcUnixToLocalDateTime(_weather.GetHourlies().Last().dt);
+        string expirationStr = expirationDt.ToString("h tt");
+        if (now < expirationDt)
         {            
-            return $"Hourly forecast until {dateTime}";
+            return $"Hourly forecast until {expirationStr}";
         }
-        return $"Hourly forecasts expired {dateTime}";        
+        return $"Hourly forecasts expired {expirationStr}";        
+    }
+
+    public string PutDailyOption()
+    {
+        DateTime now = DateTime.UtcNow.AddSeconds(_weather.GetTimeZoneOffset());
+        DateTime expirationDt = UtcUnixToLocalDateTime(_weather.GetDailies().Last().dt);
+        string expirationStr = expirationDt.ToString("dddd");
+        if (now < expirationDt)
+        {            
+            return $"Daily forecasts until {expirationStr}";
+        }
+        return $"Daily forecasts expired {expirationStr}";
     }
 
     public string PutLongPlaceName()
     {
         return _place.GetLongName();
-    }
-
-    public string PutMinutelyOption()
-    {
-        string dateTime = _weather.GetLastMinute().ToString("dddd, h:mm tt");
-        if (DateTime.Now > _weather.GetLastMinute())
-        {            
-            return $"Minutely forecast until {dateTime}";
-        }
-        return $"Minutely forecasts expired {dateTime}";        
     }
 
     public string PutShortPlaceName()
@@ -204,7 +274,6 @@ public class Forecast
     {
         _weather = weather;
     }
-
 
     public DateTime UtcUnixToLocalDateTime(int unixUtc)
     {

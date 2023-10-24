@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 public abstract class ApiCaller
 {
-    protected HttpClient _client;
+    private HttpClient _client;
 
     public ApiCaller()
     {
