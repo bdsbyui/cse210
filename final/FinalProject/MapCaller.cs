@@ -4,7 +4,7 @@ public class MapCaller : ApiCaller
 {
     private string _baseUrl 
             = "https://maps.googleapis.com/maps/api/geocode/";
-    private string _key = "AIzaSyBbSy-ZSL9fw-ukvAUxrxXUDgaek_P25EQ";
+    private string _key = "";
     private string _relativeUrl;
 
     public MapCaller(string search)

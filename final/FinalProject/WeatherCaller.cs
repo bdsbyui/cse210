@@ -3,7 +3,7 @@ using System;
 public class WeatherCaller : ApiCaller
 {
     private string _baseUrl = "https://api.openweathermap.org/data/3.0/";
-    private string _key = "040c9732ca7f6f93a9be29e9c6078796";
+    private string _key = "";
     private string _relativeUrl;
     private string _units = "imperial";
     private Forecast _forecast;
